@@ -1,10 +1,10 @@
-use web_server::ThreadPool;
 use std::fs;
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::thread;
 use std::time::Duration;
+use web_server::ThreadPool;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
@@ -27,12 +27,18 @@ fn handle_connection(mut stream: TcpStream) {
 
     let get = b"GET / HTTP/1.1\r\n";
     let sleep = b"GET /sleep HTTP/1.1\r\n";
+    let post = b"POST / HTTP/1.1\r\n";
 
+    // println!("Get index: {}\n Get sleep: {}\n Post test: {}", String::from_utf8_lossy(get), String::from_utf8_lossy(sleep), String::from_utf8_lossy(post));
     let (status_line, filename) = if buffer.starts_with(get) {
-        ("HTTP/1.1 200 OK", "src/public/hello.html")
+        ("HTTP/1.1 200 OK", "src/public/index.html")
+    } else if buffer.starts_with(post) {
+        // print data from post
+        
+        ("HTTP/1.1 200 OK", "src/public/index.html")
     } else if buffer.starts_with(sleep) {
         thread::sleep(Duration::from_secs(5));
-        ("HTTP/1.1 200 OK", "src/public/hello.html")
+        ("HTTP/1.1 200 OK", "src/public/index.html")
     } else {
         ("HTTP/1.1 404 NOT FOUND", "src/public/404.html")
     };
